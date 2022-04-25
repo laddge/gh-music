@@ -43,11 +43,11 @@ def encrypt_token(token):
         else:
             keystr = secrets.token_hex()
             os.environ["KEY_STR"] = keystr
-            os.environ["KEY_UPDATED"] = str(time.time())
+            os.environ["KEY_UPDATED"] = str(int(time.time()))
     else:
         keystr = secrets.token_hex()
         os.environ["KEY_STR"] = keystr
-        os.environ["KEY_UPDATED"] = str(time.time())
+        os.environ["KEY_UPDATED"] = str(int(time.time()))
     return cryptocode.encrypt(token, keystr)
 
 
