@@ -77,12 +77,14 @@ async def get_root(encrypted_token: Optional[str] = Cookie(None)):
 
 @app.get("/callback")
 async def get_callback(code: str):
+    url = "https://github.com/login/oauth/access_token"
+    headers = {"Accept": "application/json"}
     data = json.dumps({
         "client_id": GH_CLIENT_ID,
         "client_secret": GH_CLIENT_SECRET,
         "code": code
     })
-    r = requests.post("https://github.com/login/oauth/access_token", data=data)
+    r = requests.post(url, headers=headers, data=data)
     encrypted_token = encrypt_token(r.json()["access_token"])
     response = RedirectResponse("/")
     response.set_cookie(key="encrypted_token", value=encrypted_token)
