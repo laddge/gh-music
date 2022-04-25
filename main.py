@@ -1,7 +1,6 @@
 import os
 import time
 import secrets
-import json
 from urllib.parse import urlparse
 from fastapi import FastAPI, Request, Cookie
 from fastapi.responses import RedirectResponse, Response, HTMLResponse
@@ -79,12 +78,12 @@ async def get_root(encrypted_token: Optional[str] = Cookie(None)):
 async def get_callback(code: str):
     url = "https://github.com/login/oauth/access_token"
     headers = {"Accept": "application/json"}
-    data = json.dumps({
+    params = {
         "client_id": GH_CLIENT_ID,
         "client_secret": GH_CLIENT_SECRET,
         "code": code
-    })
-    r = requests.post(url, headers=headers, data=data)
+    }
+    r = requests.get(url, headers=headers, params=params)
     encrypted_token = encrypt_token(r.json()["access_token"])
     response = RedirectResponse("/")
     response.set_cookie(key="encrypted_token", value=encrypted_token)
