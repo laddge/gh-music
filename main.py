@@ -88,3 +88,10 @@ async def get_callback(code: str):
     response = RedirectResponse("/")
     response.set_cookie(key="encrypted_token", value=encrypted_token)
     return response
+
+
+@app.get("/logout")
+async def get_logout():
+    response = RedirectResponse("/")
+    response.set_cookie(key="encrypted_token", value="")
+    return response
