@@ -1,2 +1,4 @@
 fastapi
 hypercorn
+cryptocode
+requests
