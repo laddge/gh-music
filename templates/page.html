@@ -15,7 +15,12 @@
                 <span class="navbar-brand mb-0 h1">GH Music</span>
                 <div class="me-0">
                     {% if login %}
-                    <img class="rounded-circle" src="https://github.com/{{ login }}.png" width=30 height=30>
+                    <button class="btn btn-dark p-0 border-0 rounded-circle" id="dropdownLogout" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img class="rounded-circle" src="https://github.com/{{ login }}.png" width=30 height=30>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end mx-3" aria-labelledby="dropdownLogout">
+                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                    </ul>
                     {% else %}
                     <a class="navbar-brand mb-0 mx-0" href="https://github.com/login/oauth/authorize?client_id={{ client_id }}&scope=repo" taget="_blank">Login</a>
                     {% endif %}
