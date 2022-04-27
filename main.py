@@ -127,13 +127,19 @@ async def get_api(
             if f[-3:] not in ["mp3", "m4a", "wav", "ogg"]:
                 raise HTTPException(status_code=400)
             r1 = requests.get(
-                f"https://api.github.com/repos/{r}/contents{d}{f}?ref={b}",
+                f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
                 headers={"Authorization": f"token {token}"}
             )
             if r1.status_code != 200:
                 raise HTTPException(status_code=r1.status_code)
+            dl_url = ""
+            for obj in r1.json():
+                if obj["name"] == f:
+                    dl_url = obj["download_url"]
+            if not dl_url:
+                raise HTTPException(status_code=404)
             r2 = requests.get(
-                r1.json()["download_url"],
+                dl_url,
                 headers={"Authorization": f"token: {token}"},
                 stream=True
             )
