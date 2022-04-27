@@ -121,11 +121,13 @@ async def get_api(
             raise HTTPException(status_code=r0.status_code)
         b = r0.json()["default_branch"]
     if d:
+        if d[-1] != "/":
+            d += "/"
         if f:
             if f[-3:] not in ["mp3", "m4a", "wav", "ogg"]:
                 raise HTTPException(status_code=400)
             r1 = requests.get(
-                f"https://raw.githubusercontent.com/{r}/{b}{d}/{f}",
+                f"https://raw.githubusercontent.com/{r}/{b}{d}{f}",
                 headers={"Authorization": f"token: {token}"},
                 stream=True
             )
