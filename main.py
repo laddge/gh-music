@@ -6,6 +6,7 @@ from io import BytesIO
 from urllib.parse import urlparse
 from fastapi import FastAPI, Request, Cookie, HTTPException
 from fastapi.responses import RedirectResponse, Response, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from typing import Optional
 import requests
 import cryptocode
@@ -15,6 +16,7 @@ GH_CLIENT_ID = os.getenv("GH_CLIENT_ID")
 GH_CLIENT_SECRET = os.getenv("GH_CLIENT_SECRET")
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.middleware("http")
