@@ -3,7 +3,7 @@ import time
 import secrets
 from urllib.parse import urlparse
 from fastapi import FastAPI, Request, Cookie, HTTPException
-from fastapi.responses import RedirectResponse, Response, HTMLResponse, StreamingResponse
+from fastapi.responses import RedirectResponse, Response, HTMLResponse
 from typing import Optional
 import requests
 import cryptocode
@@ -59,11 +59,6 @@ def decrypt_token(encrypted_token):
         return cryptocode.decrypt(encrypted_token, keystr)
     else:
         return
-
-
-async def get_content(r):
-    for chunk in r.iter_content(chunk_size=128):
-        yield chunk
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -145,7 +140,7 @@ async def get_api(
             )
             if r2.status_code != 200:
                 raise HTTPException(status_code=r2.status_code)
-            return StreamingResponse(get_content(r2))
+            return Response(content=r2.content, media_type=r2.headers["Content-Type"])
         r1 = requests.get(
             f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
             headers={"Authorization": f"token {token}"}
