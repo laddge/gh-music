@@ -127,13 +127,19 @@ async def get_api(
             if f[-3:] not in ["mp3", "m4a", "wav", "ogg"]:
                 raise HTTPException(status_code=400)
             r1 = requests.get(
-                f"https://raw.githubusercontent.com/{r}/{b}{d}{f}",
-                headers={"Authorization": f"token: {token}"},
-                stream=True
+                f"https://api.github.com/repos/{r}/contents{d}{f}?ref={b}",
+                headers={"Authorization": f"token {token}"}
             )
             if r1.status_code != 200:
                 raise HTTPException(status_code=r1.status_code)
-            return StreamingResponse(get_content(r1))
+            r2 = requests.get(
+                r1.json()["download_url"],
+                headers={"Authorization": f"token: {token}"},
+                stream=True
+            )
+            if r2.status_code != 200:
+                raise HTTPException(status_code=r2.status_code)
+            return StreamingResponse(get_content(r2))
         r1 = requests.get(
             f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
             headers={"Authorization": f"token {token}"}
