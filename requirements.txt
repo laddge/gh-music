@@ -1,5 +1,6 @@
 fastapi
 aiofiles
+jinja2
 hypercorn
 cryptocode
 requests

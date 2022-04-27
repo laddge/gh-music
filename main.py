@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 from fastapi import FastAPI, Request, Cookie, HTTPException
 from fastapi.responses import RedirectResponse, Response, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from typing import Optional
 import requests
 import cryptocode
@@ -17,6 +18,8 @@ GH_CLIENT_SECRET = os.getenv("GH_CLIENT_SECRET")
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="templates")
 
 
 @app.middleware("http")
@@ -67,16 +70,21 @@ def decrypt_token(encrypted_token):
 
 
 @app.get("/", response_class=HTMLResponse)
-async def get_root(encrypted_token: Optional[str] = Cookie(None)):
+async def get_root(request: Request, encrypted_token: Optional[str] = Cookie(None)):
+    login = ""
     if encrypted_token:
         token = decrypt_token(encrypted_token)
         if token:
             headers = {"Authorization": f"token {token}"}
             r = requests.get("https://api.github.com/user", headers=headers)
             if r.status_code == 200:
-                return "Logined as {}(@{}).".format(r.json()["name"], r.json()["login"])
-    url = f"https://github.com/login/oauth/authorize?client_id={GH_CLIENT_ID}&scope=repo"
-    return f"<a href='{url}'>Login with GitHub</a>"
+                login = r.json()["login"]
+    data = {
+        "request": request,
+        "login": login,
+        "client_id": GH_CLIENT_ID
+    }
+    return templates.TemplateResponse("page.html", data)
 
 
 @app.get("/callback")
