@@ -2,3 +2,4 @@ fastapi
 hypercorn
 cryptocode
 requests
+mutagen

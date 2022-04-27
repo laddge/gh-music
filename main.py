@@ -1,12 +1,15 @@
 import os
 import time
 import secrets
+import base64
+from io import BytesIO
 from urllib.parse import urlparse
 from fastapi import FastAPI, Request, Cookie, HTTPException
 from fastapi.responses import RedirectResponse, Response, HTMLResponse
 from typing import Optional
 import requests
 import cryptocode
+from mutagen.id3 import ID3
 
 GH_CLIENT_ID = os.getenv("GH_CLIENT_ID")
 GH_CLIENT_SECRET = os.getenv("GH_CLIENT_SECRET")
@@ -149,9 +152,24 @@ async def get_api(
             raise HTTPException(status_code=r1.status_code)
         files = []
         for obj in r1.json():
-            if obj["type"] == "file":
-                if obj["name"][-3:] in ["mp3", "m4a", "wav", "ogg"]:
-                    files.append(obj["name"])
+            if obj["type"] != "file":
+                continue
+            if obj["name"][-3:] not in ["mp3", "m4a", "wav", "ogg"]:
+                continue
+            audio = {"name": obj["name"]}
+            r2 = requests.get(
+                obj["download_url"],
+                headers={"Authorization": f"token: {token}"},
+                stream=True
+            )
+            if r2.status_code != 200:
+                raise HTTPException(status_code=r2.status_code)
+            tags = ID3(BytesIO(r2.content))
+            audio["title"] = tags.get("TIT2").text[0] if tags.get("TIT2") else ""
+            audio["artist"] = tags.get("TPE1").text[0] if tags.get("TPE1") else ""
+            apic = tags.get("APIC:")
+            audio["apic"] = base64.b64encode(apic.data).decode() if apic else ""
+            files.append(audio)
         return files
     r1 = requests.get(
         f"https://api.github.com/repos/{r}/git/trees/{b}?recursive=true",
