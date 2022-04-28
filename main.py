@@ -176,14 +176,17 @@ async def get_api(
             )
             if r2.status_code != 200:
                 raise HTTPException(status_code=r2.status_code)
-            tags = ID3(BytesIO(r2.content))
-            audio["title"] = tags.get("TIT2").text[0] if tags.get("TIT2") else ""
-            audio["artist"] = tags.get("TPE1").text[0] if tags.get("TPE1") else ""
-            apic = tags.get("APIC:")
-            audio["apic"] = base64.b64encode(apic.data).decode() if apic else ""
-            audio_file = mutagen.File(BytesIO(r2.content))
-            audio["length"] = audio_file.info.length
-            files.append(audio)
+            try:
+                tags = ID3(BytesIO(r2.content))
+                audio["title"] = tags.get("TIT2").text[0] if tags.get("TIT2") else ""
+                audio["artist"] = tags.get("TPE1").text[0] if tags.get("TPE1") else ""
+                apic = tags.get("APIC:")
+                audio["apic"] = base64.b64encode(apic.data).decode() if apic else ""
+                audio_file = mutagen.File(BytesIO(r2.content))
+                audio["length"] = audio_file.info.length
+                files.append(audio)
+            except Exception:
+                pass
         return files
     if not b:
         r0 = requests.get(
