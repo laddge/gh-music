@@ -120,15 +120,15 @@ async def get_api(
     if not r:
         raise HTTPException(status_code=400)
     token = decrypt_token(encrypted_token) if encrypted_token else None
-    if not b:
-        r0 = requests.get(
-            f"https://api.github.com/repos/{r}",
-            headers={"Authorization": f"token {token}"}
-        )
-        if r0.status_code != 200:
-            raise HTTPException(status_code=r0.status_code)
-        b = r0.json()["default_branch"]
     if d:
+        if not b:
+            r0 = requests.get(
+                f"https://api.github.com/repos/{r}",
+                headers={"Authorization": f"token {token}"}
+            )
+            if r0.status_code != 200:
+                raise HTTPException(status_code=r0.status_code)
+            b = r0.json()["default_branch"]
         if d[-1] != "/":
             d += "/"
         if f:
@@ -181,14 +181,32 @@ async def get_api(
             audio["apic"] = base64.b64encode(apic.data).decode() if apic else ""
             files.append(audio)
         return files
-    r1 = requests.get(
+    if not b:
+        r0 = requests.get(
+            f"https://api.github.com/repos/{r}",
+            headers={"Authorization": f"token {token}"}
+        )
+        if r0.status_code != 200:
+            raise HTTPException(status_code=r0.status_code)
+        r1 = requests.get(
+            f"https://api.github.com/repos/{r}/branches",
+            headers={"Authorization": f"token {token}"}
+        )
+        if r1.status_code != 200:
+            raise HTTPException(status_code=r1.status_code)
+        res = {
+            "branches": [br["name"] for br in r1.json()],
+            "default_branch": r0.json()["default_branch"]
+        }
+        return res
+    r0 = requests.get(
         f"https://api.github.com/repos/{r}/git/trees/{b}?recursive=true",
         headers={"Authorization": f"token {token}"}
     )
-    if r1.status_code != 200:
-        raise HTTPException(status_code=r1.status_code)
+    if r0.status_code != 200:
+        raise HTTPException(status_code=r0.status_code)
     trees = ["/"]
-    for tree in r1.json()["tree"]:
+    for tree in r0.json()["tree"]:
         if tree["type"] == "tree":
             trees.append("/" + tree["path"])
     return trees
