@@ -12,6 +12,7 @@ from typing import Optional
 import requests
 import cryptocode
 from mutagen.id3 import ID3
+import mutagen
 
 GH_CLIENT_ID = os.getenv("GH_CLIENT_ID")
 GH_CLIENT_SECRET = os.getenv("GH_CLIENT_SECRET")
@@ -180,6 +181,8 @@ async def get_api(
             audio["artist"] = tags.get("TPE1").text[0] if tags.get("TPE1") else ""
             apic = tags.get("APIC:")
             audio["apic"] = base64.b64encode(apic.data).decode() if apic else ""
+            audio_file = mutagen.File(BytesIO(r2.content))
+            audio["length"] = audio_file.info.length
             files.append(audio)
         return files
     if not b:
