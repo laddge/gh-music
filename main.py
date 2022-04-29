@@ -128,11 +128,16 @@ async def get_api(
         raise HTTPException(status_code=400)
     token = decrypt_token(encrypted_token) if encrypted_token else None
     headers = {"Authorization": f"token {token}"} if token else None
+    params = {
+        "client_id": GH_CLIENT_ID,
+        "client_secret": GH_CLIENT_SECRET,
+    }
     if d:
         if not b:
             r0 = requests.get(
                 f"https://api.github.com/repos/{r}",
-                headers=headers
+                headers=headers,
+                params=params
             )
             if r0.status_code != 200:
                 raise HTTPException(status_code=r0.status_code)
@@ -144,7 +149,8 @@ async def get_api(
                 raise HTTPException(status_code=400)
             r1 = requests.get(
                 f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
-                headers=headers
+                headers=headers,
+                params=params
             )
             if r1.status_code != 200:
                 raise HTTPException(status_code=r1.status_code)
@@ -157,6 +163,7 @@ async def get_api(
             r2 = requests.get(
                 dl_url,
                 headers=headers,
+                params=params,
                 stream=True
             )
             if r2.status_code != 200:
@@ -164,7 +171,8 @@ async def get_api(
             return Response(content=r2.content, media_type=r2.headers["Content-Type"])
         r1 = requests.get(
             f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
-            headers=headers
+            headers=headers,
+            params=params
         )
         if r1.status_code != 200:
             raise HTTPException(status_code=r1.status_code)
@@ -178,6 +186,7 @@ async def get_api(
             r2 = requests.get(
                 obj["download_url"],
                 headers=headers,
+                params=params,
                 stream=True
             )
             if r2.status_code != 200:
@@ -197,13 +206,15 @@ async def get_api(
     if not b:
         r0 = requests.get(
             f"https://api.github.com/repos/{r}",
-            headers=headers
+            headers=headers,
+            params=params
         )
         if r0.status_code != 200:
             raise HTTPException(status_code=r0.status_code)
         r1 = requests.get(
             f"https://api.github.com/repos/{r}/branches",
-            headers=headers
+            headers=headers,
+            params=params
         )
         if r1.status_code != 200:
             raise HTTPException(status_code=r1.status_code)
@@ -214,7 +225,8 @@ async def get_api(
         return res
     r0 = requests.get(
         f"https://api.github.com/repos/{r}/git/trees/{b}?recursive=true",
-        headers=headers
+        headers=headers,
+        params=params
     )
     if r0.status_code != 200:
         raise HTTPException(status_code=r0.status_code)
