@@ -64,7 +64,7 @@ function list() {
                 } else {
                     rowHTML += '<td>Null</td>';
                 }
-                rowHTML += '<td>' + formatSec(row.length) + '</td></tr>';
+                rowHTML += '<td>' + formatSec(row.length) + '</td><input type="hidden" value="' + row.apic + '"></tr>';
                 listBody.innerHTML += rowHTML;
             });
         })
