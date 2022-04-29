@@ -106,14 +106,14 @@ async def get_callback(code: str, redirect: Optional[str] = None):
     encrypted_token = encrypt_token(r.json()["access_token"])
     redirect_url = urllib.parse.unquote(redirect) if redirect else "/"
     response = RedirectResponse(redirect_url)
-    response.set_cookie(key="encrypted_token", value=encrypted_token)
+    response.set_cookie(key="encrypted_token", value=encrypted_token, max_age=2600000)
     return response
 
 
 @app.get("/logout")
 async def get_logout():
     response = RedirectResponse("/")
-    response.set_cookie(key="encrypted_token", value="")
+    response.delete_cookie(key="encrypted_token")
     return response
 
 
