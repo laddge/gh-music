@@ -64,7 +64,7 @@
                     </div>
                 </div>
             </noscript>
-            <div class="mt-4 mx-sm-auto mx-2 col-sm-8">
+            <div class="mt-4 mx-sm-auto mx-2 col-sm-8" style="height: calc(100vh - 4.625rem); overflow: auto;">
                 <div class="text-center d-none" id="loading">
                     <div class="spinner-border text-light" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -73,9 +73,9 @@
                 <table class="table table-dark d-none" id="list">
                     <thead>
                         <tr>
-                            <th scope="col">Title</th>
-                            <th scope="col">Artist</th>
-                            <th scope="col">Duration</th>
+                            <th class="sticky-top" scope="col">Title</th>
+                            <th class="sticky-top" scope="col">Artist</th>
+                            <th class="sticky-top" scope="col">Duration</th>
                         </tr>
                     </thead>
                     <tbody id="listBody">
