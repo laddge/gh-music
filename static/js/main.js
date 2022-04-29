@@ -1,3 +1,10 @@
+function login() {
+    const clientId = document.getElementById('clientId').value;
+    const redirect = encodeURIComponent(location.href);
+    const redirectURI = encodeURIComponent('https://gh-music.laddge.net/callback?redirect=' + redirect);
+    location.href = 'https://github.com/login/oauth/authorize?client_id=' + clientId + '&scope=repo&redirect_uri=' + redirectURI;
+}
+
 function getParam(key) {
     const params = location.search.slice(1).split('&');
     let value = ''

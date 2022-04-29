@@ -81,14 +81,10 @@ async def get_root(request: Request, encrypted_token: Optional[str] = Cookie(Non
             r = requests.get("https://api.github.com/user", headers=headers)
             if r.status_code == 200:
                 login = r.json()["login"]
-    redirect = urllib.parse.quote(str(request.url))
-    redirect_uri = urllib.parse.quote(
-        f"https://gh-music.laddge.net/callback?redirect={redirect}")
     data = {
         "request": request,
         "login": login,
         "client_id": GH_CLIENT_ID,
-        "redirect_uri": redirect_uri
     }
     return templates.TemplateResponse("page.html", data)
 
