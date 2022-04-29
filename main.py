@@ -5,6 +5,7 @@ import base64
 from io import BytesIO
 from urllib.parse import urlparse
 import urllib.parse
+import hashlib
 from fastapi import FastAPI, Request, Cookie, HTTPException
 from fastapi.responses import RedirectResponse, Response, HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -81,8 +82,11 @@ async def get_root(request: Request, encrypted_token: Optional[str] = Cookie(Non
             r = requests.get("https://api.github.com/user", headers=headers)
             if r.status_code == 200:
                 login = r.json()["login"]
+    with open("./static/js/main.js", "rb") as f:
+        main_js_md5 = hashlib.md5(f.read()).hexdigest()
     data = {
         "request": request,
+        "main_js_md5": main_js_md5,
         "login": login,
         "client_id": GH_CLIENT_ID,
     }
