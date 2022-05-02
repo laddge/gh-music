@@ -182,6 +182,18 @@ function formatSec(sec) {
     return m + ':' + s;
 }
 
+function openFile(index) {
+    history.replaceState('', '', '/?r=' + getParam('r') + '&b=' + getParam('b') + '&d=' + getParam('d') + '&i=' + String(index));
+    const trs = Array.from(document.getElementById('listBody').children);
+    for (let i = 0; i < trs.length; i++) {
+        if (i == index) {
+            trs[i].classList.add('table-active');
+        } else {
+            trs[i].classList.remove('table-active');
+        }
+    }
+}
+
 async function list() {
     const repo = getParam('r');
     const branch = getParam('b');
@@ -213,10 +225,11 @@ async function list() {
             }
             listEl.classList.remove('d-none');
             const listBody = document.getElementById('listBody');
-            data.forEach(row => {
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
                 let rowHTML = '<tr>';
                 if (row.title) {
-                    rowHTML += '<td>' + row.title + '</td>';
+                    rowHTML += '<td><a class="text-decoration-underline text-light" onclick="openFile(' + String(i) + ');">' + row.title + '</a></td>';
                 } else {
                     rowHTML += '<td>' + row.name + '</td>';
                 }
@@ -227,7 +240,12 @@ async function list() {
                 }
                 rowHTML += '<td>' + formatSec(row.length) + '</td></tr>';
                 listBody.innerHTML += rowHTML;
-            });
+            }
+            if (getParam('i')) {
+                openFile(getParam('i'));
+            } else {
+                openFile(0);
+            }
         })
         .catch(err => {
             loading.classList.add('d-none');
