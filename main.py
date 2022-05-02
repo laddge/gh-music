@@ -139,8 +139,6 @@ async def get_api(
                 raise HTTPException(status_code=r0.status_code)
             b = r0.json()["default_branch"]
         if f:
-            if f[-3:] not in ["mp3", "m4a", "wav", "ogg"]:
-                raise HTTPException(status_code=400)
             r1 = requests.get(
                 f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
                 headers=headers,
@@ -170,8 +168,6 @@ async def get_api(
         files = []
         for obj in r1.json():
             if obj["type"] != "file":
-                continue
-            if obj["name"][-3:] not in ["mp3", "m4a", "wav", "ogg"]:
                 continue
             audio = {"name": obj["name"]}
             r2 = requests.get(
