@@ -25,7 +25,7 @@ function resetOpener() {
     openBtn.disabled = true;
 }
 
-async function listDir() {
+async function listDir(onLoad=false) {
     const spinner = document.getElementById('listDirSpinner');
     const placeholder = document.getElementById('listDirPlaceholder');
     const form = document.getElementById('listDirForm');
@@ -47,6 +47,9 @@ async function listDir() {
         })
         .then(data => {
             let html = '<div class="form-check ps-0 my-0"><label class="form-check-label"><input type="radio" class="form-check-input d-none" name="listDir" value="/" checked><span class="rounded-1 px-1">/</span></label></div>';
+            if (onLoad && getParam('d') != '/') {
+                html = '<div class="form-check ps-0 my-0"><label class="form-check-label"><input type="radio" class="form-check-input d-none" name="listDir" value="/"><span class="rounded-1 px-1">/</span></label></div>';
+            }
             if (data.length > 1) {
                 const lines = data.slice(1);
                 let dnn = [];
@@ -86,7 +89,11 @@ async function listDir() {
                         end = '├──&nbsp;';
                     }
                     const value = lines[i];
-                    html += '<div class="form-check ps-0 my-0"><label class="form-check-label"><input type="radio" class="form-check-input d-none" name="listDir" value="' + value + '">' + indent + end + '<span class="rounded-1 px-1">' + dnn[i][1] + '</span></label></div>';
+                    let checked = '';
+                    if (onLoad && value == getParam('d')) {
+                        checked = ' checked';
+                    }
+                    html += '<div class="form-check ps-0 my-0"><label class="form-check-label"><input type="radio" class="form-check-input d-none" name="listDir" value="' + value + '"' + checked + '>' + indent + end + '<span class="rounded-1 px-1">' + dnn[i][1] + '</span></label></div>';
                 }
             }
             form.innerHTML = html;
@@ -99,7 +106,7 @@ async function listDir() {
         });
 }
 
-async function checkRepo() {
+async function checkRepo(onLoad=false) {
     const spinner = document.getElementById('checkRepoSpinner');
     const text = document.getElementById('checkRepoText');
     const inputRepo = document.getElementById('inputRepo');
@@ -119,15 +126,22 @@ async function checkRepo() {
         })
         .then(data => {
             inputBranch.innerHTML = '<option selected>' + data.default_branch + '</option>';
+            if (onLoad && getParam('b') != data.default_branch) {
+                inputBranch.innerHTML = '<option selected>' + data.default_branch + '</option>';
+            }
             data.branches.forEach(branch => {
                 if (branch != data.default_branch) {
-                    inputBranch.innerHTML += '<option>' + branch + '</option>';
+                    let selected = '';
+                    if (onLoad && branch == getParam('b')) {
+                        selected = ' selected';
+                    }
+                    inputBranch.innerHTML += '<option' + selected + '>' + branch + '</option>';
                 }
             });
             spinner.classList.add('d-none');
             text.classList.remove('d-none');
             inputRepo.classList.add('is-valid');
-            listDir();
+            listDir(onLoad);
         })
         .catch(err => {
             spinner.classList.add('d-none');
@@ -177,6 +191,8 @@ async function list() {
     const loading = document.getElementById('loading');
     listEl.classList.add('d-none');
     loading.classList.remove('d-none');
+    document.getElementById('inputRepo').value = repo;
+    checkRepo(true);
     const api = '/api?r=' + repo + '&b=' + branch + '&d=' + dir;
     fetch(api)
         .then(res => {
