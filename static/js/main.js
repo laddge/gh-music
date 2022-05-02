@@ -1,3 +1,5 @@
+let listData;
+
 function login() {
     const clientId = document.getElementById('clientId').value;
     const redirect = encodeURIComponent(location.href);
@@ -203,6 +205,7 @@ async function list() {
             }
         })
         .then(data => {
+            listData = data;
             loading.classList.add('d-none');
             if (data.length == 0) {
                 document.getElementById('error').innerText = 'No musics found.';
@@ -222,7 +225,7 @@ async function list() {
                 } else {
                     rowHTML += '<td>Null</td>';
                 }
-                rowHTML += '<td>' + formatSec(row.length) + '</td><input type="hidden" value="' + row.apic + '"></tr>';
+                rowHTML += '<td>' + formatSec(row.length) + '</td></tr>';
                 listBody.innerHTML += rowHTML;
             });
         })
