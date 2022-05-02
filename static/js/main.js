@@ -25,7 +25,7 @@ function resetOpener() {
     openBtn.disabled = true;
 }
 
-function listDir() {
+async function listDir() {
     const spinner = document.getElementById('listDirSpinner');
     const placeholder = document.getElementById('listDirPlaceholder');
     const form = document.getElementById('listDirForm');
@@ -99,7 +99,7 @@ function listDir() {
         });
 }
 
-function checkRepo() {
+async function checkRepo() {
     const spinner = document.getElementById('checkRepoSpinner');
     const text = document.getElementById('checkRepoText');
     const inputRepo = document.getElementById('inputRepo');
@@ -166,7 +166,7 @@ function formatSec(sec) {
     return m + ':' + s;
 }
 
-function list() {
+async function list() {
     const repo = getParam('r');
     const branch = getParam('b');
     const dir = getParam('d');
