@@ -138,8 +138,6 @@ async def get_api(
             if r0.status_code != 200:
                 raise HTTPException(status_code=r0.status_code)
             b = r0.json()["default_branch"]
-        if d[-1] != "/":
-            d += "/"
         if f:
             if f[-3:] not in ["mp3", "m4a", "wav", "ogg"]:
                 raise HTTPException(status_code=400)
