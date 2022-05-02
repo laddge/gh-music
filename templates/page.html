@@ -22,6 +22,38 @@
                 background-color: #0d6efd;
                 color: #f8f9fa;
             }
+            input[type="range"] {
+                -webkit-appearance: none;
+                appearance: none;
+                cursor: pointer;
+                outline: none;
+                height: .5rem;
+                width: 100%;
+                background: rgba(0, 0, 0, 0);
+                margin: 0px;
+            }
+            input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                background: #f8f9fa;
+                width: 1rem;
+                height: 1rem;
+                border-radius: 50%;
+                box-shadow: none;
+            }
+            input[type="range"]::-moz-range-thumb {
+                background: #f8f9fa;
+                width: 1rem;
+                height: 1rem;
+                border-radius: 50%;
+                box-shadow: none;
+                border: none;
+            }
+            input[type="range"]::-moz-focus-outer {
+                border: 0;
+            }
+            input[type="range"]:active::-webkit-slider-thumb {
+                box-shadow: none;
+            }
         </style>
         <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
         <script defer src="/static/js/main.js?md5={{ main_js_md5 }}"></script>
@@ -131,7 +163,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-4 mx-sm-auto mx-2 col-sm-8" style="height: calc(100vh - 4.625rem); overflow: auto;">
+            <div class="mt-4 mx-sm-auto mx-2 col-sm-8" style="height: calc(100vh - 17.625rem); overflow: auto;">
                 <div class="text-center d-none" id="loading">
                     <div class="spinner-border text-light" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -149,6 +181,55 @@
                     </tbody>
                 </table>
                 <div class="text-light text-center h3" id="error"></div>
+            </div>
+            <div class="position-fixed w-100 bg-dark text-light border-top p-4" style="bottom: 0; height: 10rem;">
+                <div class="mx-auto row col-md-7 h-100 visually-hidden" id="playerWrapper">
+                    <div class="h-100 p-0" style="width: 7rem;">
+                        <img class="h-100 w-100" id="playerPic" onerror="this.src = '/static/apic.png';">
+                    </div>
+                    <div class="h-100 ms-3" style="width: calc(100% - 8rem);">
+                        <div class="h3 text-center" id="playerTitle" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"></div>
+                        <audio class="d-none" id="playerAudio"></audio>
+                        <div class="row d-flex align-items-center font-monospace">
+                            <div class="col-auto" id="playerCurrent">00:00</div>
+                            <div class="col bg-secondary rounded p-0 position-relative" style="height: .5rem;">
+                                <div class="position-absolute h-100 rounded" style="top: 0px; left: 0px; width: 0%; background-color: #19657F;" id="seekLine"></div>
+                                <input type="range" id="seekRange" class="position-absolute w-100" style="top: 0px; left: 0px;" min="0" max="100" step="1" value="0" onchange="seek();" oninput="seek();">
+                            </div>
+                            <div class="col-auto" id="playerDuration">00:00</div>
+                        </div>
+                        <div class="row text-center mt-2">
+                            <div class="col">
+                                <a onclick="backward();">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M.5 3.5A.5.5 0 0 0 0 4v8a.5.5 0 0 0 1 0V8.753l6.267 3.636c.54.313 1.233-.066 1.233-.697v-2.94l6.267 3.636c.54.314 1.233-.065 1.233-.696V4.308c0-.63-.693-1.01-1.233-.696L8.5 7.248v-2.94c0-.63-.692-1.01-1.233-.696L1 7.248V4a.5.5 0 0 0-.5-.5z"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="col">
+                                <a onclick="playToggle();">
+                                    <span id="playBtn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="d-none" id="pauseBtn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16">
+                                            <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/>
+                                        </svg>
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="col">
+                                <a onclick="forward();">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V8.753l-6.267 3.636c-.54.313-1.233-.066-1.233-.697v-2.94l-6.267 3.636C.693 12.703 0 12.324 0 11.693V4.308c0-.63.693-1.01 1.233-.696L7.5 7.248v-2.94c0-.63.693-1.01 1.233-.696L15 7.248V4a.5.5 0 0 1 .5-.5z"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
