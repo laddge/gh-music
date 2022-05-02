@@ -214,4 +214,6 @@ function list() {
         });
 }
 
-list();
+window.onload = function () {
+    list();
+}
