@@ -204,6 +204,10 @@ async function list() {
         })
         .then(data => {
             loading.classList.add('d-none');
+            if (data.length == 0) {
+                document.getElementById('error').innerText = 'No musics found.';
+                return;
+            }
             listEl.classList.remove('d-none');
             const listBody = document.getElementById('listBody');
             data.forEach(row => {
