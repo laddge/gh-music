@@ -171,7 +171,6 @@ async function list() {
     const branch = getParam('b');
     const dir = getParam('d');
     if (!repo || !branch || !dir) {
-        console.log('aho');
         return;
     }
     const listEl = document.getElementById('list');
