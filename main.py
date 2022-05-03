@@ -2,6 +2,9 @@ import os
 import time
 import secrets
 import base64
+import asyncio
+import queue
+import threading
 from io import BytesIO
 from urllib.parse import urlparse
 import urllib.parse
@@ -70,6 +73,42 @@ def decrypt_token(encrypted_token):
         return cryptocode.decrypt(encrypted_token, keystr)
     else:
         return
+
+
+def get_audio(name, url, headers):
+    audio = {"name": name}
+    r2 = requests.get(
+        url,
+        headers=headers,
+        stream=True
+    )
+    if r2.status_code != 200:
+        raise HTTPException(status_code=r2.status_code)
+    try:
+        tags = ID3(BytesIO(r2.content))
+        audio["title"] = tags.get("TIT2").text[0] if tags.get("TIT2") else ""
+        audio["artist"] = tags.get("TPE1").text[0] if tags.get("TPE1") else ""
+        apic = tags.get("APIC:")
+        audio["apic"] = base64.b64encode(apic.data).decode() if apic else ""
+        audio_file = mutagen.File(BytesIO(r2.content))
+        audio["length"] = audio_file.info.length
+        return audio
+    except Exception:
+        pass
+
+
+def get_audio_thr(args, q):
+    loop = asyncio.new_event_loop()
+    cors = []
+    for arg in args:
+        cors.append(
+            loop.run_in_executor(
+                None, get_audio, *arg
+            )
+        )
+    gather = asyncio.gather(*cors)
+    files = loop.run_until_complete(gather)
+    q.put(files)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -169,30 +208,17 @@ async def get_api(
         )
         if r1.status_code != 200:
             raise HTTPException(status_code=r1.status_code)
-        files = []
+        args = []
         for obj in r1.json():
             if obj["type"] != "file":
                 continue
-            audio = {"name": obj["name"]}
-            r2 = requests.get(
-                obj["download_url"],
-                headers=headers,
-                stream=True
-            )
-            if r2.status_code != 200:
-                raise HTTPException(status_code=r2.status_code)
-            try:
-                tags = ID3(BytesIO(r2.content))
-                audio["title"] = tags.get("TIT2").text[0] if tags.get("TIT2") else ""
-                audio["artist"] = tags.get("TPE1").text[0] if tags.get("TPE1") else ""
-                apic = tags.get("APIC:")
-                audio["apic"] = base64.b64encode(apic.data).decode() if apic else ""
-                audio_file = mutagen.File(BytesIO(r2.content))
-                audio["length"] = audio_file.info.length
-                files.append(audio)
-            except Exception:
-                pass
-        return files
+            args.append([obj["name"], obj["download_url"], headers])
+        q = queue.Queue()
+        thread = threading.Thread(target=get_audio_thr, args=[args, q])
+        thread.start()
+        thread.join()
+        files = q.get()
+        return list(filter(None, files))
     if not b:
         r0 = requests.get(
             f"https://api.github.com/repos/{r}",
