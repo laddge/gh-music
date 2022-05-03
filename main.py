@@ -83,7 +83,7 @@ def get_audio(name, url, headers):
         stream=True
     )
     if r2.status_code != 200:
-        raise HTTPException(status_code=r2.status_code)
+        return
     try:
         tags = ID3(BytesIO(r2.content))
         audio["title"] = tags.get("TIT2").text[0] if tags.get("TIT2") else ""
