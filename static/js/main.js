@@ -243,6 +243,10 @@ function openFile(index) {
         pauseBtn.classList.add('d-none');
         playBtn.classList.remove('d-none');
     });
+    playerAudio.addEventListener('ended', () => {
+        forward();
+        playerAudio.play();
+    });
     playerSpinner.classList.add('d-none');
     playerWrapper.classList.remove('d-none');
     if (playing) {
