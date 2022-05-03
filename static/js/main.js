@@ -210,8 +210,10 @@ function openFile(index) {
     const pauseBtn = document.getElementById('pauseBtn');
     playerWrapper.classList.add('d-none');
     playerSpinner.classList.remove('d-none');
-    pauseBtn.classList.add('d-none');
-    playBtn.classList.remove('d-none');
+    let playing = false;
+    if (playBtn.classList.contains('d-none')) {
+        playing = true;
+    }
     playerAudio.src = '/api?r=' + getParam('r') + '&b=' + getParam('b') + '&d=' + getParam('d') + '&f=' + encodeURIComponent(listData[index]['name']);
     playerPic.src = 'data:image/png;base64,' + listData[index]['apic'];
     if (listData[index]['title']) {
@@ -225,8 +227,6 @@ function openFile(index) {
     seekRange.value = Math.floor(playerAudio.currentTime);
     seek();
     playerAudio.load();
-    playerSpinner.classList.add('d-none');
-    playerWrapper.classList.remove('d-none');
     playerAudio.addEventListener('timeupdate', () => {
         seekRange.value = Math.floor(playerAudio.currentTime);
         seek(false);
@@ -243,6 +243,11 @@ function openFile(index) {
         pauseBtn.classList.add('d-none');
         playBtn.classList.remove('d-none');
     });
+    playerSpinner.classList.add('d-none');
+    playerWrapper.classList.remove('d-none');
+    if (playing) {
+        playerAudio.play();
+    }
 }
 
 async function list() {
@@ -333,35 +338,17 @@ function seek(update=true) {
 }
 
 function backward() {
-    const playBtn = document.getElementById('playBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
     const playerAudio = document.getElementById('playerAudio');
     if (playerAudio.currentTime < 3) {
-        let playing = false;
-        if (playBtn.classList.contains('d-none')) {
-            playing = true;
-        }
         openFile(Number(getParam('i')) - 1);
-        if (playing) {
-            playerAudio.play();
-        }
     } else {
         playerAudio.currentTime = 0;
     }
 }
 
 function forward() {
-    const playBtn = document.getElementById('playBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
     const playerAudio = document.getElementById('playerAudio');
-    let playing = false;
-    if (playBtn.classList.contains('d-none')) {
-        playing = true;
-    }
     openFile(Number(getParam('i')) + 1);
-    if (playing) {
-        playerAudio.play();
-    }
 }
 
 window.onload = function () {
