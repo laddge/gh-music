@@ -264,7 +264,7 @@ async function list() {
             if (res.ok) {
                 return res.json();
             } else {
-                throw new Error(res.status);
+                throw new Error(res.status + ' ' + res.statusText);
             }
         })
         .then(data => {
@@ -300,7 +300,7 @@ async function list() {
         })
         .catch(err => {
             loading.classList.add('d-none');
-            document.getElementById('error').innerText = 'Something wrong.';
+            document.getElementById('error').innerText = err;
             console.log(err);
         });
 }
