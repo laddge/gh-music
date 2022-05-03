@@ -198,6 +198,7 @@ function openFile(index) {
             trs[i].classList.remove('table-active');
         }
     }
+    const playerSpinner = document.getElementById('playerSpinner');
     const playerAudio = document.getElementById('playerAudio');
     const playerWrapper = document.getElementById('playerWrapper');
     const seekRange = document.getElementById('seekRange');
@@ -207,11 +208,12 @@ function openFile(index) {
     const playerDuration = document.getElementById('playerDuration');
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
+    playerWrapper.classList.add('d-none');
+    playerSpinner.classList.remove('d-none');
     pauseBtn.classList.add('d-none');
     playBtn.classList.remove('d-none');
     playerAudio.src = '/api?r=' + getParam('r') + '&b=' + getParam('b') + '&d=' + getParam('d') + '&f=' + encodeURIComponent(listData[index]['name']);
     playerPic.src = 'data:image/png;base64,' + listData[index]['apic'];
-    playerWrapper.classList.remove('visually-hidden');
     if (listData[index]['title']) {
         playerTitle.innerText = listData[index]['title'];
     } else {
@@ -222,6 +224,9 @@ function openFile(index) {
     seekRange.max = Math.floor(listData[index]['length']);
     seekRange.value = Math.floor(playerAudio.currentTime);
     seek();
+    playerAudio.load();
+    playerSpinner.classList.add('d-none');
+    playerWrapper.classList.remove('d-none');
     playerAudio.addEventListener('timeupdate', () => {
         seekRange.value = Math.floor(playerAudio.currentTime);
         seek(false);

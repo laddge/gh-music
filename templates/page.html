@@ -183,7 +183,10 @@
                 <div class="text-light text-center h3" id="error"></div>
             </div>
             <div class="position-fixed w-100 bg-dark text-light border-top p-4" style="bottom: 0; height: 10rem;">
-                <div class="mx-auto row col-md-7 h-100 visually-hidden" id="playerWrapper">
+                <div class="text-center mt-3 d-none" id="playerSpinner">
+                    <div class="spinner-border mt-4 mx-auto"></div>
+                </div>
+                <div class="mx-auto row col-md-7 h-100 d-none" id="playerWrapper">
                     <div class="h-100 p-0" style="width: 7rem;">
                         <img class="h-100 w-100" id="playerPic" onerror="this.src = '/static/apic.png';">
                     </div>
