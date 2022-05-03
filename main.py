@@ -158,7 +158,11 @@ async def get_api(
             )
             if r2.status_code != 200:
                 raise HTTPException(status_code=r2.status_code)
-            return Response(content=r2.content, media_type=r2.headers["Content-Type"])
+            return Response(
+                content=r2.content,
+                headers={"Accept-Ranges": "bytes"},
+                media_type=r2.headers["Content-Type"]
+            )
         r1 = requests.get(
             f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
             headers=headers,
