@@ -183,9 +183,6 @@
                 <div class="text-light text-center h3" id="error"></div>
             </div>
             <div class="position-fixed w-100 bg-dark text-light border-top p-4" style="bottom: 0; height: 10rem;">
-                <div class="text-center mt-3 d-none" id="playerSpinner">
-                    <div class="spinner-border mt-4 mx-auto"></div>
-                </div>
                 <div class="mx-auto row col-md-7 h-100 d-none" id="playerWrapper">
                     <div class="h-100 p-0" style="width: 7rem;">
                         <img class="h-100 w-100" id="playerPic" onerror="this.src = '/static/apic.png';">
@@ -210,7 +207,8 @@
                                 </a>
                             </div>
                             <div class="col">
-                                <a onclick="playToggle();">
+                                <div class="spinner-border d-none" id="playerSpinner"></div>
+                                <a class="text-light d-none" onclick="playToggle();" id="playerToggle">
                                     <span id="playBtn">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>

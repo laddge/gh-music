@@ -198,7 +198,6 @@ function openFile(index) {
             trs[i].classList.remove('table-active');
         }
     }
-    const playerSpinner = document.getElementById('playerSpinner');
     const playerAudio = document.getElementById('playerAudio');
     const playerWrapper = document.getElementById('playerWrapper');
     const seekRange = document.getElementById('seekRange');
@@ -206,10 +205,11 @@ function openFile(index) {
     const playerTitle = document.getElementById('playerTitle');
     const playerCurrent = document.getElementById('playerCurrent');
     const playerDuration = document.getElementById('playerDuration');
+    const playerSpinner = document.getElementById('playerSpinner');
+    const playerToggle = document.getElementById('playerToggle');
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     playerWrapper.classList.add('d-none');
-    playerSpinner.classList.remove('d-none');
     let playing = false;
     if (playBtn.classList.contains('d-none')) {
         playing = true;
@@ -226,6 +226,9 @@ function openFile(index) {
     seekRange.max = Math.floor(listData[index]['length']);
     seekRange.value = Math.floor(playerAudio.currentTime);
     seek();
+    playerToggle.classList.add('d-none');
+    playerSpinner.classList.remove('d-none');
+    playerWrapper.classList.remove('d-none');
     playerAudio.addEventListener('timeupdate', () => {
         seekRange.value = Math.floor(playerAudio.currentTime);
         seek(false);
@@ -248,7 +251,7 @@ function openFile(index) {
     });
     playerAudio.addEventListener('canplay', () => {
         playerSpinner.classList.add('d-none');
-        playerWrapper.classList.remove('d-none');
+        playerToggle.classList.remove('d-none');
         if (playing) {
             playerAudio.play();
         }
