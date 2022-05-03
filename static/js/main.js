@@ -229,33 +229,6 @@ function openFile(index) {
     playerToggle.classList.add('d-none');
     playerSpinner.classList.remove('d-none');
     playerWrapper.classList.remove('d-none');
-    playerAudio.addEventListener('timeupdate', () => {
-        seekRange.value = Math.floor(playerAudio.currentTime);
-        seek(false);
-        if (!isNaN(playerAudio.duration)) {
-            playerCurrent.innerHTML = formatSec(playerAudio.currentTime);
-            playerDuration.innerHTML = formatSec(playerAudio.duration);
-        }
-    });
-    playerAudio.addEventListener('play', () => {
-        playBtn.classList.add('d-none');
-        pauseBtn.classList.remove('d-none');
-    });
-    playerAudio.addEventListener('pause', () => {
-        pauseBtn.classList.add('d-none');
-        playBtn.classList.remove('d-none');
-    });
-    playerAudio.addEventListener('ended', () => {
-        forward();
-        playerAudio.play();
-    });
-    playerAudio.addEventListener('canplay', () => {
-        playerSpinner.classList.add('d-none');
-        playerToggle.classList.remove('d-none');
-        if (playing) {
-            playerAudio.play();
-        }
-    });
 }
 
 async function list() {
@@ -360,5 +333,40 @@ function forward() {
 }
 
 window.onload = function () {
+    const playerAudio = document.getElementById('playerAudio');
+    const seekRange = document.getElementById('seekRange');
+    const playerCurrent = document.getElementById('playerCurrent');
+    const playerDuration = document.getElementById('playerDuration');
+    const playerSpinner = document.getElementById('playerSpinner');
+    const playerToggle = document.getElementById('playerToggle');
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
     list();
+    playerAudio.addEventListener('timeupdate', () => {
+        seekRange.value = Math.floor(playerAudio.currentTime);
+        seek(false);
+        if (!isNaN(playerAudio.duration)) {
+            playerCurrent.innerHTML = formatSec(playerAudio.currentTime);
+            playerDuration.innerHTML = formatSec(playerAudio.duration);
+        }
+    });
+    playerAudio.addEventListener('play', () => {
+        playBtn.classList.add('d-none');
+        pauseBtn.classList.remove('d-none');
+    });
+    playerAudio.addEventListener('pause', () => {
+        pauseBtn.classList.add('d-none');
+        playBtn.classList.remove('d-none');
+    });
+    playerAudio.addEventListener('ended', () => {
+        forward();
+        playerAudio.play();
+    });
+    playerAudio.addEventListener('canplay', () => {
+        playerSpinner.classList.add('d-none');
+        playerToggle.classList.remove('d-none');
+        if (playing) {
+            playerAudio.play();
+        }
+    });
 }
