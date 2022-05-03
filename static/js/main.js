@@ -338,10 +338,6 @@ window.onload = function () {
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     list();
-    let playing = false;
-    if (playBtn.classList.contains('d-none')) {
-        playing = true;
-    }
     playerAudio.addEventListener('timeupdate', () => {
         seekRange.value = Math.floor(playerAudio.currentTime);
         seek(false);
@@ -363,6 +359,10 @@ window.onload = function () {
         playerAudio.play();
     });
     playerAudio.addEventListener('canplay', () => {
+        let playing = false;
+        if (playBtn.classList.contains('d-none')) {
+            playing = true;
+        }
         playerSpinner.classList.add('d-none');
         playerToggle.classList.remove('d-none');
         if (playing) {
