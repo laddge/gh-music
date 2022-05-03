@@ -210,10 +210,6 @@ function openFile(index) {
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     playerWrapper.classList.add('d-none');
-    let playing = false;
-    if (playBtn.classList.contains('d-none')) {
-        playing = true;
-    }
     playerAudio.src = '/api?r=' + getParam('r') + '&b=' + getParam('b') + '&d=' + getParam('d') + '&f=' + encodeURIComponent(listData[index]['name']);
     playerPic.src = 'data:image/png;base64,' + listData[index]['apic'];
     if (listData[index]['title']) {
@@ -342,6 +338,10 @@ window.onload = function () {
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     list();
+    let playing = false;
+    if (playBtn.classList.contains('d-none')) {
+        playing = true;
+    }
     playerAudio.addEventListener('timeupdate', () => {
         seekRange.value = Math.floor(playerAudio.currentTime);
         seek(false);
