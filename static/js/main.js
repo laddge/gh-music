@@ -319,10 +319,10 @@ function seek(update=true) {
     const playerAudio = document.getElementById('playerAudio');
     const seekLine = document.getElementById('seekLine');
     const seekRange = document.getElementById('seekRange');
-    if (!isNaN(playerAudio.duration)) {
-        seekLine.style.width = String(seekRange.value / playerAudio.duration * 100) + '%';
-    }
+    const playerCurrent = document.getElementById('playerCurrent');
+    seekLine.style.width = String(seekRange.value / listData[getParam('i')]['length'] * 100) + '%';
     if (update) {
+        playerCurrent.innerHTML = formatSec(seekRange.value);
         playerAudio.currentTime = seekRange.value;
     }
 }
