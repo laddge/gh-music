@@ -226,7 +226,6 @@ function openFile(index) {
     seekRange.max = Math.floor(listData[index]['length']);
     seekRange.value = Math.floor(playerAudio.currentTime);
     seek();
-    playerAudio.load();
     playerAudio.addEventListener('timeupdate', () => {
         seekRange.value = Math.floor(playerAudio.currentTime);
         seek(false);
@@ -247,11 +246,13 @@ function openFile(index) {
         forward();
         playerAudio.play();
     });
-    playerSpinner.classList.add('d-none');
-    playerWrapper.classList.remove('d-none');
-    if (playing) {
-        playerAudio.play();
-    }
+    playerAudio.addEventListener('canplay', () => {
+        playerSpinner.classList.add('d-none');
+        playerWrapper.classList.remove('d-none');
+        if (playing) {
+            playerAudio.play();
+        }
+    });
 }
 
 async function list() {
