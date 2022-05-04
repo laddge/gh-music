@@ -210,7 +210,7 @@ function openFile(index) {
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     playerWrapper.classList.add('d-none');
-    playerAudio.src = '/api?r=' + getParam('r') + '&b=' + getParam('b') + '&d=' + getParam('d') + '&f=' + encodeURIComponent(listData[index]['name']);
+    playerAudio.src = listData[index]['url'];
     playerPic.src = 'data:image/png;base64,' + listData[index]['apic'];
     if (listData[index]['title']) {
         playerTitle.innerText = listData[index]['title'];

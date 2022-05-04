@@ -76,7 +76,7 @@ def decrypt_token(encrypted_token):
 
 
 def get_audio(name, url, headers):
-    audio = {"name": name}
+    audio = {"name": name, "url": url}
     r2 = requests.get(
         url,
         headers=headers,
@@ -161,7 +161,6 @@ async def get_api(
         r: Optional[str] = None,
         b: Optional[str] = None,
         d: Optional[str] = None,
-        f: Optional[str] = None,
         encrypted_token: Optional[str] = Cookie(None)):
     if not r:
         raise HTTPException(status_code=400)
@@ -177,31 +176,6 @@ async def get_api(
             if r0.status_code != 200:
                 raise HTTPException(status_code=r0.status_code)
             b = r0.json()["default_branch"]
-        if f:
-            r1 = requests.get(
-                f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
-                headers=headers,
-            )
-            if r1.status_code != 200:
-                raise HTTPException(status_code=r1.status_code)
-            dl_url = ""
-            for obj in r1.json():
-                if obj["name"] == f:
-                    dl_url = obj["download_url"]
-            if not dl_url:
-                raise HTTPException(status_code=404)
-            r2 = requests.get(
-                dl_url,
-                headers=headers,
-                stream=True
-            )
-            if r2.status_code != 200:
-                raise HTTPException(status_code=r2.status_code)
-            return Response(
-                content=r2.content,
-                headers={"Accept-Ranges": "bytes"},
-                media_type=r2.headers["Content-Type"]
-            )
         r1 = requests.get(
             f"https://api.github.com/repos/{r}/contents{d}?ref={b}",
             headers=headers,
