@@ -2,9 +2,7 @@ import os
 import time
 import secrets
 import base64
-import asyncio
-import queue
-import threading
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from urllib.parse import urlparse
 import urllib.parse
@@ -75,11 +73,11 @@ def decrypt_token(encrypted_token):
         return
 
 
-def get_audio(name, url, headers):
-    audio = {"name": name, "url": url}
+def get_audio_data(args):
+    audio = {"name": args[0], "url": args[1]}
     r2 = requests.get(
-        url,
-        headers=headers,
+        args[1],
+        headers=args[2],
         stream=True
     )
     if r2.status_code != 200:
@@ -95,20 +93,6 @@ def get_audio(name, url, headers):
         return audio
     except Exception:
         pass
-
-
-def get_audio_thr(args, q):
-    loop = asyncio.new_event_loop()
-    cors = []
-    for arg in args:
-        cors.append(
-            loop.run_in_executor(
-                None, get_audio, *arg
-            )
-        )
-    gather = asyncio.gather(*cors)
-    files = loop.run_until_complete(gather)
-    q.put(files)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -187,11 +171,8 @@ async def get_api(
             if obj["type"] != "file":
                 continue
             args.append([obj["name"], obj["download_url"], headers])
-        q = queue.Queue()
-        thread = threading.Thread(target=get_audio_thr, args=[args, q])
-        thread.start()
-        thread.join()
-        files = q.get()
+        with ThreadPoolExecutor(9) as executor:
+            files = list(executor.map(get_audio_data, args))
         return list(filter(None, files))
     if not b:
         r0 = requests.get(
