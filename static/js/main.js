@@ -1,4 +1,5 @@
 let listData;
+let audio = new Audio();
 
 function login() {
     const clientId = document.getElementById('clientId').value;
@@ -198,7 +199,6 @@ function openFile(index) {
             trs[i].classList.remove('table-active');
         }
     }
-    const playerAudio = document.getElementById('playerAudio');
     const playerWrapper = document.getElementById('playerWrapper');
     const seekRange = document.getElementById('seekRange');
     const playerPic = document.getElementById('playerPic');
@@ -210,7 +210,7 @@ function openFile(index) {
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     playerWrapper.classList.add('d-none');
-    playerAudio.src = listData[index]['url'];
+    audio.src = listData[index]['url'];
     playerPic.src = 'data:image/png;base64,' + listData[index]['apic'];
     if (listData[index]['title']) {
         playerTitle.innerText = listData[index]['title'];
@@ -220,7 +220,7 @@ function openFile(index) {
     playerCurrent.innerHTML = '00:00';
     playerDuration.innerHTML = formatSec(listData[index]['length']);
     seekRange.max = Math.floor(listData[index]['length']);
-    seekRange.value = Math.floor(playerAudio.currentTime);
+    seekRange.value = Math.floor(audio.currentTime);
     seek();
     playerToggle.classList.add('d-none');
     playerSpinner.classList.remove('d-none');
@@ -290,46 +290,41 @@ async function list() {
 function playToggle() {
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
-    const playerAudio = document.getElementById('playerAudio');
     if (pauseBtn.classList.contains('d-none')) {
         playBtn.classList.add('d-none');
         pauseBtn.classList.remove('d-none');
-        playerAudio.play();
+        audio.play();
     } else {
         pauseBtn.classList.add('d-none');
         playBtn.classList.remove('d-none');
-        playerAudio.pause();
+        audio.pause();
     }
 }
 
 function seek(update=true) {
-    const playerAudio = document.getElementById('playerAudio');
     const seekLine = document.getElementById('seekLine');
     const seekRange = document.getElementById('seekRange');
     const playerCurrent = document.getElementById('playerCurrent');
     seekLine.style.width = String(seekRange.value / listData[getParam('i')]['length'] * 100) + '%';
     if (update) {
         playerCurrent.innerHTML = formatSec(seekRange.value);
-        playerAudio.currentTime = seekRange.value;
+        audio.currentTime = seekRange.value;
     }
 }
 
 function backward() {
-    const playerAudio = document.getElementById('playerAudio');
-    if (playerAudio.currentTime < 3) {
+    if (audio.currentTime < 3) {
         openFile(Number(getParam('i')) - 1);
     } else {
-        playerAudio.currentTime = 0;
+        audio.currentTime = 0;
     }
 }
 
 function forward() {
-    const playerAudio = document.getElementById('playerAudio');
     openFile(Number(getParam('i')) + 1);
 }
 
 window.onload = function () {
-    const playerAudio = document.getElementById('playerAudio');
     const seekRange = document.getElementById('seekRange');
     const playerCurrent = document.getElementById('playerCurrent');
     const playerDuration = document.getElementById('playerDuration');
@@ -338,27 +333,27 @@ window.onload = function () {
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     list();
-    playerAudio.addEventListener('timeupdate', () => {
-        seekRange.value = Math.floor(playerAudio.currentTime);
+    audio.addEventListener('timeupdate', () => {
+        seekRange.value = Math.floor(audio.currentTime);
         seek(false);
-        if (!isNaN(playerAudio.duration)) {
-            playerCurrent.innerHTML = formatSec(playerAudio.currentTime);
-            playerDuration.innerHTML = formatSec(playerAudio.duration);
+        if (!isNaN(audio.duration)) {
+            playerCurrent.innerHTML = formatSec(audio.currentTime);
+            playerDuration.innerHTML = formatSec(audio.duration);
         }
     });
-    playerAudio.addEventListener('play', () => {
+    audio.addEventListener('play', () => {
         playBtn.classList.add('d-none');
         pauseBtn.classList.remove('d-none');
     });
-    playerAudio.addEventListener('pause', () => {
+    audio.addEventListener('pause', () => {
         pauseBtn.classList.add('d-none');
         playBtn.classList.remove('d-none');
     });
-    playerAudio.addEventListener('ended', () => {
+    audio.addEventListener('ended', () => {
         forward();
-        playerAudio.play();
+        audio.play();
     });
-    playerAudio.addEventListener('canplay', () => {
+    audio.addEventListener('canplay', () => {
         let playing = false;
         if (playBtn.classList.contains('d-none')) {
             playing = true;
@@ -366,7 +361,7 @@ window.onload = function () {
         playerSpinner.classList.add('d-none');
         playerToggle.classList.remove('d-none');
         if (playing) {
-            playerAudio.play();
+            audio.play();
         }
     });
 }
